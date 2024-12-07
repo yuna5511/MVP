@@ -8,6 +8,7 @@ module.exports = {
       },
     },
   },
+  darkMode: 'class', // fix: https://github.com/onesine/react-tailwindcss-datepicker/issues/175#issuecomment-1662255148
   content: [
     './src/**/*.{js,ts,jsx,tsx}',
     './node_modules/react-tailwindcss-datepicker/dist/index.esm.{js,ts}',
