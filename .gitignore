@@ -1,0 +1,22 @@
+# frontend container
+/frontend/node_modules
+/frontend/.pnp
+/frontend/.pnp.js
+/frontend/npm-debug.log*
+/frontend/yarn-debug.log*
+/frontend/yarn-error.log*
+/frontend/coverage
+/frontend/build
+
+# api container
+/api/tmp
+/api/log
+
+# misc
+.DS_Store
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+*.swp
