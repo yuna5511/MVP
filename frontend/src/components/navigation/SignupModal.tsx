@@ -1,11 +1,90 @@
+import { useState, FormEvent, ChangeEvent, memo } from 'react';
 import Modal from '../shared/Modal';
 import PasswordInput from '../shared/PasswordInput';
+import axios from 'axios';
+import { existsValidator, emailValidator } from '../../utils/validator';
+import { useAuth } from '../../context/AuthContext';
 
-const SignupModal = () => {
+const SignupModal = memo(() => {
+  const { login } = useAuth();
+  const signupDialog = document.getElementById(
+    'signup_modal'
+  ) as HTMLDialogElement;
+  const [formData, setFormData] = useState({
+    firstName: '',
+    lastName: '',
+    email: '',
+    password: '',
+  });
+
+  const [loading, setLoading] = useState<boolean | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleSubmit = async (e: FormEvent) => {
+    e.preventDefault();
+    setError(null);
+    setLoading(true);
+
+    const firstNameError = existsValidator(formData.firstName, '姓', 2);
+    const lastNameError = existsValidator(formData.lastName, '名', 2);
+    const emailError = emailValidator(formData.email);
+    const passwordError = existsValidator(formData.password, 'パスワード', 8);
+
+    const joinedValidationError = [
+      firstNameError,
+      lastNameError,
+      emailError,
+      passwordError,
+    ]
+      .filter((error) => error !== undefined)
+      .join('');
+    if (joinedValidationError?.length) {
+      setError(joinedValidationError);
+      setLoading(false);
+      return;
+    }
+
+    try {
+      const response = await axios.post(
+        '/api/signup',
+        {
+          user: {
+            first_name: formData.firstName,
+            last_name: formData.lastName,
+            email: formData.email,
+            password: formData.password,
+          },
+        },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+      setLoading(false);
+      if (response.status === 201) {
+        const { user, token } = response.data;
+        sessionStorage.setItem('token', token);
+        login(user);
+        signupDialog?.close();
+        alert('登録完了しました');
+      }
+    } catch (err: any) {
+      setLoading(false);
+      if (err.response && err.response.data) {
+        setError(err.response.data.message || '登録失敗しました。');
+      } else {
+        setError('登録中にエラーが発生しました。');
+      }
+    }
+  };
+
   const loginModalHandler = () => {
-    const signupDialog = document.getElementById(
-      'signup_modal'
-    ) as HTMLDialogElement;
     const loginDialog = document.getElementById(
       'login_modal'
     ) as HTMLDialogElement;
@@ -27,24 +106,52 @@ const SignupModal = () => {
             次のレベルに進めましょう
           </h3>
         </div>
-        <div className="flex flex-col gap-2 w-80 mb-4">
+        <form className="flex flex-col gap-2 w-80 mb-4">
           <input
             type="text"
+            name="firstName"
             placeholder="姓"
             className="input input-bordered w-full"
+            onChange={handleInputChange}
+            disabled={!!loading}
+            required
           />
           <input
             type="text"
+            name="lastName"
             placeholder="名"
             className="input input-bordered w-full"
+            onChange={handleInputChange}
+            disabled={!!loading}
+            required
           />
           <input
             type="email"
-            placeholder="メール"
+            name="email"
+            placeholder="メールアドレス"
             className="input input-bordered w-full"
+            onChange={handleInputChange}
+            disabled={!!loading}
+            required
           />
-          <PasswordInput />
-        </div>
+          <PasswordInput
+            value={formData.password}
+            onValueChange={handleInputChange}
+            disabled={!!loading}
+          />
+          {!loading && error && <p className="text-error">{error}</p>}
+
+          <div className="flex justify-center">
+            <button
+              className="btn btn-neutral w-[120px]"
+              onClick={handleSubmit}
+              disabled={!!loading}
+            >
+              {loading && <span className="loading loading-spinner"></span>}
+              登録
+            </button>
+          </div>
+        </form>
         <div className="font-medium">
           <span>既にアカウントをお持ちですか？</span>
           <button
@@ -57,6 +164,6 @@ const SignupModal = () => {
       </div>
     </Modal>
   );
-};
+});
 
 export default SignupModal;
