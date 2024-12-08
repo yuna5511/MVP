@@ -9,5 +9,6 @@ Rails.application.routes.draw do
   # root "posts#index"
 
   post 'signup', to: 'users#create'
+  get 'profile', to: 'users#show'
   post 'validate-location', to: 'location_validator#validate'
 end

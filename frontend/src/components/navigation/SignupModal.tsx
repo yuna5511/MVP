@@ -3,8 +3,10 @@ import Modal from '../shared/Modal';
 import PasswordInput from '../shared/PasswordInput';
 import axios from 'axios';
 import { existsValidator, emailValidator } from '../../utils/validator';
+import { useAuth } from '../../context/AuthContext';
 
 const SignupModal = memo(() => {
+  const { login } = useAuth();
   const signupDialog = document.getElementById(
     'signup_modal'
   ) as HTMLDialogElement;
@@ -48,7 +50,7 @@ const SignupModal = memo(() => {
     }
 
     try {
-      await axios.post(
+      const response = await axios.post(
         '/api/signup',
         {
           user: {
@@ -65,8 +67,13 @@ const SignupModal = memo(() => {
         }
       );
       setLoading(false);
-      signupDialog?.close();
-      alert('登録完了しました');
+      if (response.status === 201) {
+        const { user, token } = response.data;
+        sessionStorage.setItem('token', token);
+        login(user);
+        signupDialog?.close();
+        alert('登録完了しました');
+      }
     } catch (err: any) {
       setLoading(false);
       if (err.response && err.response.data) {

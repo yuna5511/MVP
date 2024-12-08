@@ -31,7 +31,11 @@ export const emailValidator: Validator = (value: string) => {
 
 export const locationValidator: AsyncValidator = async (location: string) => {
   try {
-    const response = await axios.post('/api/validate-location', { location });
+    const response = await axios.post(
+      '/api/validate-location',
+      { location },
+      { withCredentials: false }
+    );
     if (!response.data.isValid) {
       return '無効な場所です';
     }
