@@ -1,7 +1,18 @@
+import { useState, ChangeEvent } from 'react';
 import Modal from '../shared/Modal';
 import PasswordInput from '../shared/PasswordInput';
 
 const LoginModal = () => {
+  const [formData, setFormData] = useState({
+    email: '',
+    password: '',
+  });
+
+  const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
   const signupModalHandler = () => {
     const signupDialog = document.getElementById(
       'signup_modal'
@@ -27,10 +38,16 @@ const LoginModal = () => {
         <div className="flex flex-col gap-2 w-full mb-9">
           <input
             type="email"
+            name="email"
             placeholder="メール"
             className="input input-bordered w-full"
+            value={formData.email}
+            onChange={handleInputChange}
           />
-          <PasswordInput />
+          <PasswordInput
+            value={formData.password}
+            onValueChange={handleInputChange}
+          />
         </div>
         <div className="flex font-normal items-center">
           <span className="text-nowrap">

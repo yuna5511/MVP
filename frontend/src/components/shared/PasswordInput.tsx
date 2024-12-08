@@ -1,6 +1,16 @@
-import { useState } from 'react';
+import { useState, ChangeEvent } from 'react';
 
-const PasswordInput = () => {
+type PasswordInputProps = {
+  value: string;
+  onValueChange: (e: ChangeEvent<HTMLInputElement>) => void;
+  disabled?: boolean;
+};
+
+const PasswordInput = ({
+  value,
+  onValueChange,
+  disabled = undefined,
+}: PasswordInputProps) => {
   const [passwordVisible, setPasswordVisible] = useState(false);
 
   const togglePasswordVisibility = () => {
@@ -12,8 +22,13 @@ const PasswordInput = () => {
       <div className="relative">
         <input
           type={passwordVisible ? 'text' : 'password'}
+          name="password"
           placeholder="パスワード"
           className="input input-bordered w-full"
+          value={value}
+          onChange={onValueChange}
+          required
+          disabled={disabled}
         />
         <button
           type="button"
