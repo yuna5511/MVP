@@ -28,8 +28,7 @@ const NavBar = () => {
         <div className="flex-none">
           {isAuthenticated ? (
             <div className="flex items-center">
-              <span className="mr-4">{`Hello, ${user?.firstName}`}</span>{' '}
-              {/* Display user's first name */}
+              <span className="mr-4">{`こんにちは、${user?.lastName}さん`}</span>{' '}
               <button
                 className="btn btn-neutral font-medium"
                 onClick={handleLogout}
