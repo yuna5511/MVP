@@ -2,11 +2,17 @@ import { useState, FormEvent, ChangeEvent, memo } from 'react';
 import Modal from '../shared/Modal';
 import PasswordInput from '../shared/PasswordInput';
 import axios from 'axios';
-import { existsValidator, emailValidator } from '../../utils/validator';
+import {
+  existsValidator,
+  emailValidator,
+  joinErrors,
+} from '../../utils/validator';
 import { useAuth } from '../../context/AuthContext';
+import { useToast } from '../../context/ToastContext';
 
 const SignupModal = memo(() => {
-  const { login } = useAuth();
+  const { setUserProfile } = useAuth();
+  const { showToast } = useToast();
   const signupDialog = document.getElementById(
     'signup_modal'
   ) as HTMLDialogElement;
@@ -35,14 +41,12 @@ const SignupModal = memo(() => {
     const emailError = emailValidator(formData.email);
     const passwordError = existsValidator(formData.password, 'パスワード', 8);
 
-    const joinedValidationError = [
+    const joinedValidationError = joinErrors([
       firstNameError,
       lastNameError,
       emailError,
       passwordError,
-    ]
-      .filter((error) => error !== undefined)
-      .join('');
+    ]);
     if (joinedValidationError?.length) {
       setError(joinedValidationError);
       setLoading(false);
@@ -70,9 +74,9 @@ const SignupModal = memo(() => {
       if (response.status === 201) {
         const { user, token } = response.data;
         sessionStorage.setItem('token', token);
-        login(user);
+        setUserProfile(user);
         signupDialog?.close();
-        alert('登録完了しました');
+        showToast('登録完了しました', 'success');
       }
     } catch (err: any) {
       setLoading(false);
