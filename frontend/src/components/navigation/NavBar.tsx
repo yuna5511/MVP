@@ -1,10 +1,12 @@
 import LoginModal from './LoginModal';
 import SignupModal from './SignupModal';
 import { useAuth } from '../../context/AuthContext';
+import { useToast } from '../../context/ToastContext';
 import { useNavigate } from 'react-router';
 
 const NavBar = () => {
   const { user, isAuthenticated, logout } = useAuth();
+  const { showToast } = useToast();
   const navigate = useNavigate();
 
   const signupModalHandler = () =>
@@ -15,6 +17,7 @@ const NavBar = () => {
   const handleLogout = async () => {
     await logout();
     navigate('/');
+    showToast('ログアウトに成功', 'success');
   };
 
   return (

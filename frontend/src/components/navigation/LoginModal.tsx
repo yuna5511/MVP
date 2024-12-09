@@ -7,6 +7,7 @@ import {
   existsValidator,
   joinErrors,
 } from '../../utils/validator';
+import { useToast } from '../../context/ToastContext';
 
 const LoginModal = () => {
   const [formData, setFormData] = useState({
@@ -17,6 +18,7 @@ const LoginModal = () => {
   const [loading, setLoading] = useState<boolean>(false);
 
   const { login } = useAuth();
+  const { showToast } = useToast();
   const signupDialog = document.getElementById(
     'signup_modal'
   ) as HTMLDialogElement;
@@ -46,9 +48,10 @@ const LoginModal = () => {
     try {
       await login(formData.email, formData.password);
       loginDialog?.close();
+      showToast('ログイン成功', 'success');
       setLoading(false);
     } catch (err: any) {
-      setError('Invalid email or password');
+      setError(err.message || '無効なメールアドレスまたはパスワード');
       setLoading(false);
     }
   };

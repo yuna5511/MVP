@@ -8,9 +8,11 @@ import {
   joinErrors,
 } from '../../utils/validator';
 import { useAuth } from '../../context/AuthContext';
+import { useToast } from '../../context/ToastContext';
 
 const SignupModal = memo(() => {
   const { setUserProfile } = useAuth();
+  const { showToast } = useToast();
   const signupDialog = document.getElementById(
     'signup_modal'
   ) as HTMLDialogElement;
@@ -74,7 +76,7 @@ const SignupModal = memo(() => {
         sessionStorage.setItem('token', token);
         setUserProfile(user);
         signupDialog?.close();
-        alert('登録完了しました');
+        showToast('登録完了しました', 'success');
       }
     } catch (err: any) {
       setLoading(false);

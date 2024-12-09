@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import PageLayout from '../shared/PageLayout';
 import Datepicker, { DateValueType } from 'react-tailwindcss-datepicker';
 import ListInput from '../shared/ListInput';
@@ -27,6 +27,10 @@ const Home = () => {
   const handleInvitesChange = useCallback((updatedItems: string[]) => {
     setInvites(updatedItems);
   }, []);
+
+  useEffect(() => {
+    setInvites([]);
+  }, [isAuthenticated]);
 
   return (
     <PageLayout>
