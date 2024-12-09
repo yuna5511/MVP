@@ -3,8 +3,10 @@ import PageLayout from '../shared/PageLayout';
 import Datepicker, { DateValueType } from 'react-tailwindcss-datepicker';
 import ListInput from '../shared/ListInput';
 import { emailValidator, locationValidator } from '../../utils/validator';
+import { useAuth } from '../../context/AuthContext';
 
 const Home = () => {
+  const { isAuthenticated } = useAuth();
   const [dateRange, setDateRange] = useState<DateValueType>({
     startDate: null,
     endDate: null,
@@ -46,24 +48,26 @@ const Home = () => {
               onChange={(newDateRange) => setDateRange(newDateRange)}
             />
           </div>
-          <div>
-            {!showInviteInput ? (
-              <button
-                className="btn btn-ghost font-medium p-0"
-                onClick={toggle}
-              >
-                <span className="material-icons">add</span>旅行仲間を招待する
-              </button>
-            ) : (
-              <ListInput
-                label="旅行仲間を招待する"
-                items={invites}
-                onItemsChange={handleInvitesChange}
-                placeholder="メールアドレスを入力する"
-                validator={emailValidator}
-              />
-            )}
-          </div>
+          {isAuthenticated && (
+            <div>
+              {!showInviteInput ? (
+                <button
+                  className="btn btn-ghost font-medium p-0"
+                  onClick={toggle}
+                >
+                  <span className="material-icons">add</span>旅行仲間を招待する
+                </button>
+              ) : (
+                <ListInput
+                  label="旅行仲間を招待する"
+                  items={invites}
+                  onItemsChange={handleInvitesChange}
+                  placeholder="メールアドレスを入力する"
+                  validator={emailValidator}
+                />
+              )}
+            </div>
+          )}
           <div className="flex justify-center">
             <button
               className="btn btn-neutral w-[120px]"

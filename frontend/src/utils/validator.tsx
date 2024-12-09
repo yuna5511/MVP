@@ -44,3 +44,6 @@ export const locationValidator: AsyncValidator = async (location: string) => {
     return '場所の検証中にエラーが発生しました';
   }
 };
+
+export const joinErrors = (value: Array<string | undefined>) =>
+  value.filter((error) => error !== undefined).join('');

@@ -1,25 +1,59 @@
-import { useState, ChangeEvent } from 'react';
+import { useState, ChangeEvent, FormEvent } from 'react';
 import Modal from '../shared/Modal';
 import PasswordInput from '../shared/PasswordInput';
+import { useAuth } from '../../context/AuthContext';
+import {
+  emailValidator,
+  existsValidator,
+  joinErrors,
+} from '../../utils/validator';
 
 const LoginModal = () => {
   const [formData, setFormData] = useState({
     email: '',
     password: '',
   });
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState<boolean>(false);
+
+  const { login } = useAuth();
+  const signupDialog = document.getElementById(
+    'signup_modal'
+  ) as HTMLDialogElement;
+  const loginDialog = document.getElementById(
+    'login_modal'
+  ) as HTMLDialogElement;
 
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
+  const handleSubmit = async (e: FormEvent) => {
+    e.preventDefault();
+    setError(null);
+    setLoading(true);
+
+    const joinedValidationError = joinErrors([
+      emailValidator(formData.email),
+      existsValidator(formData.password, 'パスワード'),
+    ]);
+    if (joinedValidationError?.length) {
+      setError(joinedValidationError);
+      setLoading(false);
+      return;
+    }
+    try {
+      await login(formData.email, formData.password);
+      loginDialog?.close();
+      setLoading(false);
+    } catch (err: any) {
+      setError('Invalid email or password');
+      setLoading(false);
+    }
+  };
+
   const signupModalHandler = () => {
-    const signupDialog = document.getElementById(
-      'signup_modal'
-    ) as HTMLDialogElement;
-    const loginDialog = document.getElementById(
-      'login_modal'
-    ) as HTMLDialogElement;
     loginDialog?.close();
     signupDialog?.showModal();
   };
@@ -48,6 +82,17 @@ const LoginModal = () => {
             value={formData.password}
             onValueChange={handleInputChange}
           />
+          {error && <p className="text-error">{error}</p>}
+          <div className="flex justify-center">
+            <button
+              className="btn btn-neutral w-[120px]"
+              onClick={handleSubmit}
+              disabled={!!loading}
+            >
+              {loading && <span className="loading loading-spinner"></span>}
+              ログイン
+            </button>
+          </div>
         </div>
         <div className="flex font-normal items-center">
           <span className="text-nowrap">

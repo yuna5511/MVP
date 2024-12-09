@@ -17,7 +17,8 @@ interface User {
 interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
-  login: (user: User) => void;
+  setUserProfile: (user: User) => void;
+  login: (email: string, password: string) => Promise<void>;
   logout: () => void;
 }
 
@@ -38,7 +39,14 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   const [isLoading, setIsLoading] = useState(true);
   const isAuthenticated = !!user;
 
-  const login = (user: User) => setUser(user);
+  const login = async (email: string, password: string) => {
+    const response = await axios.post('/api/login', { email, password });
+    const { token, user: userData } = response.data;
+    sessionStorage.setItem('token', token);
+    setUser(userData);
+  };
+
+  const setUserProfile = (user: User) => setUser(user);
 
   const logout = async () => {
     sessionStorage.removeItem('token');
@@ -77,7 +85,9 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   }
 
   return (
-    <AuthContext.Provider value={{ user, isAuthenticated, login, logout }}>
+    <AuthContext.Provider
+      value={{ user, isAuthenticated, setUserProfile, login, logout }}
+    >
       {children}
     </AuthContext.Provider>
   );
