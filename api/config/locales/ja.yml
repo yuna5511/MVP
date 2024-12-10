@@ -1,0 +1,15 @@
+ja:
+  activerecord:
+    models:
+      user: ユーザー
+    attributes:
+      user:
+        first_name: 姓
+        last_name: 名
+        password: パスワード
+        email: メールアドレス
+    errors:
+      messages:
+        blank: "%{attribute}を入力してください"
+        too_long: "%{attribute}は%{count}文字以内で入力してください"
+        taken: "%{attribute}はすでに使用されています"
