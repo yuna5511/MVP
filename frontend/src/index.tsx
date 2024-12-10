@@ -4,6 +4,11 @@ import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 import 'material-icons/iconfont/material-icons.css';
+import axios from 'axios';
+
+axios.defaults.headers.common['X-CSRF-Token'] = document
+  .querySelector('meta[name="csrf-token"]')
+  ?.getAttribute('content');
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement

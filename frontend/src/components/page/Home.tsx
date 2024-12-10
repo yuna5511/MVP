@@ -4,9 +4,12 @@ import Datepicker, { DateValueType } from 'react-tailwindcss-datepicker';
 import ListInput from '../shared/ListInput';
 import { emailValidator, locationValidator } from '../../utils/validator';
 import { useAuth } from '../../context/AuthContext';
+import { useToast } from '../../context/ToastContext';
+import axios from 'axios';
 
 const Home = () => {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
+  const { showToast } = useToast();
   const [dateRange, setDateRange] = useState<DateValueType>({
     startDate: null,
     endDate: null,
@@ -27,6 +30,30 @@ const Home = () => {
   const handleInvitesChange = useCallback((updatedItems: string[]) => {
     setInvites(updatedItems);
   }, []);
+
+  const handleSubmit = async () => {
+    try {
+      if (dateRange) {
+        const userIds = isAuthenticated ? [user?.id, ...invites] : null;
+        const response = await axios.post('/api/plans', {
+          plan: {
+            user_ids: userIds,
+            start_date: dateRange.startDate,
+            end_date: dateRange.endDate,
+            places: destinations,
+          },
+        });
+        console.log('Plan created successfully', response.data);
+        showToast('Successfully created plan', 'success');
+      }
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        console.error('API error:', error.response?.data || error.message);
+      } else {
+        console.error('Unexpected error:', error);
+      }
+    }
+  };
 
   useEffect(() => {
     setInvites([]);
@@ -75,9 +102,7 @@ const Home = () => {
           <div className="flex justify-center">
             <button
               className="btn btn-neutral w-[120px]"
-              onClick={() => {
-                console.log('submit');
-              }}
+              onClick={handleSubmit}
             >
               計画を始める
             </button>

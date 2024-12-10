@@ -12,4 +12,5 @@ Rails.application.routes.draw do
   post 'signup', to: 'users#create'
   get 'profile', to: 'users#show'
   post 'validate-location', to: 'location_validator#validate'
+  resources :plans, only: [:create]
 end
