@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2024_12_10_123221) do
+ActiveRecord::Schema[8.0].define(version: 2024_12_11_154859) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -33,7 +33,7 @@ ActiveRecord::Schema[8.0].define(version: 2024_12_10_123221) do
 
   create_table "places", force: :cascade do |t|
     t.string "name"
-    t.string "google_address_id"
+    t.string "google_place_id"
     t.string "link"
     t.datetime "start_time"
     t.datetime "end_time"
