@@ -7,6 +7,7 @@ import { emailValidator, locationValidator } from '../../utils/validator';
 import { useAuth } from '../../context/AuthContext';
 import { useToast } from '../../context/ToastContext';
 import axios from 'axios';
+import { createPlan } from '../../utils/plan';
 
 const Home = () => {
   const { isAuthenticated, user } = useAuth();
@@ -48,13 +49,11 @@ const Home = () => {
       if (dateRange) {
         setLoading(true);
         const userIds = isAuthenticated ? [user?.id, ...invites] : null;
-        const response = await axios.post('/api/plans', {
-          plan: {
-            user_ids: userIds,
-            start_date: dateRange.startDate,
-            end_date: dateRange.endDate,
-            places: destinations,
-          },
+        const response = await createPlan({
+          user_ids: userIds,
+          start_date: dateRange.startDate,
+          end_date: dateRange.endDate,
+          places: destinations,
         });
         setLoading(false);
         showToast('旅行作成に成功', 'success');

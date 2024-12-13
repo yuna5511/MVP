@@ -37,10 +37,7 @@ const NavBar = () => {
           {isAuthenticated ? (
             <div className="flex items-center">
               <span className="mr-4">{`こんにちは、${user?.lastName}さん`}</span>{' '}
-              <button
-                className="btn btn-neutral font-medium"
-                onClick={handleLogout}
-              >
+              <button className="btn btn-neutral " onClick={handleLogout}>
                 ログアウト
               </button>
             </div>

@@ -6,6 +6,7 @@ import { useToast } from '../../context/ToastContext';
 import { useAuth } from '../../context/AuthContext';
 import { Plan } from '../../types/api';
 import PlanModal from '../navigation/PlanModal';
+import { getPlan } from '../../utils/plan';
 
 const TravelPlan = () => {
   const { showToast } = useToast();
@@ -14,14 +15,14 @@ const TravelPlan = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const [plan, setPlan] = useState<Plan | null>(location.state?.plan || null);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   const handleSetPlan = (plan: Plan) => setPlan(plan);
 
   const fetchPlan = async () => {
     if (!plan) {
       try {
-        const response = await axios.get(`/api/plans/${planId}`);
+        const response = await getPlan(planId as string);
         setPlan(response.data.plan);
       } catch (error) {
         setLoading(false);
@@ -42,19 +43,18 @@ const TravelPlan = () => {
   }, [plan]);
 
   useEffect(() => {
+    console.log('travel-plan: ', isAuthenticated, user, plan);
     const planDialog = document.getElementById(
       'plan_modal'
     ) as HTMLDialogElement;
     if (plan) {
       if (plan.userIds.length === 0) {
+        setLoading(false);
         if (isAuthenticated && user) {
           planDialog.showModal();
         }
       } else {
-        if (
-          !isAuthenticated ||
-          (user && !plan.userIds.includes((user?.id).toString()))
-        ) {
+        if (!isAuthenticated || (user && !plan.userIds.includes(user?.id))) {
           navigate('/');
         }
       }
@@ -63,13 +63,17 @@ const TravelPlan = () => {
 
   return (
     <PageLayout>
-      {loading && (
-        <div>
-          <span className="loading loading-spinner"></span> ロード中...
+      {loading ? (
+        <div className="flex w-full h-full justify-center items-center gap-2">
+          <span className="loading loading-spinner"></span>
+          <span>ロード中...</span>
         </div>
+      ) : (
+        <>
+          <h1>{plan?.title}</h1>
+          <PlanModal handleSetPlan={handleSetPlan} plan={plan} />
+        </>
       )}
-      <h1>{plan?.title}</h1>
-      <PlanModal handleSetPlan={handleSetPlan} plan={plan} />
     </PageLayout>
   );
 };

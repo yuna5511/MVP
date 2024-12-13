@@ -27,22 +27,15 @@ class PlansController < ApplicationController
 
   def update
     plan = Plan.find_by(id: params[:id])
-    
+
     if plan.nil?
       return render json: { error: 'Plan not found' }, status: :not_found
     end
-    
-    user_id = params[:user_ids].first  # Assuming you're passing an array of userIds, you can handle logic accordingly
-    
-    if plan.user_ids.include?(user_id)
-      return render json: { plan: plan }, status: :ok
+
+    if update_plan(plan, plan_update_params)
+      render json: { message: 'プランの更新に成功', plan: serialize_plan(plan) }, status: :ok
     else
-      plan.user_ids << user_id  # Add the user as part of the plan
-      if plan.save
-        render json: { plan: plan }, status: :ok
-      else
-        render json: { errors: plan.errors.full_messages }, status: :unprocessable_entity
-      end
+      render json: { errors: plan.errors.full_messages }, status: :unprocessable_entity
     end
   end
 
@@ -58,11 +51,93 @@ class PlansController < ApplicationController
       userIds: plan.users.map(&:id),
       title: plan.title,
       isPublic: plan.is_public,
+      notes: plan.notes || '',
       places: plan.places.as_json(only: [:id, :name, :google_place_id]),
       itinerary: {
-        startDate: plan.itinerary.start_date,
-        endDate: plan.itinerary.end_date
-      }
+        startDate: plan.itinerary&.start_date,
+        endDate: plan.itinerary&.end_date
+      },
+      hotels: plan.hotels&.map do |hotel|
+        {
+          id: hotel.id,
+          google_place_id: hotel.google_place_id,
+          check_in: hotel.check_in,
+          check_out: hotel.check_out,
+          confirmation_id: hotel.confirmation_id,
+          note: hotel.note
+        }
+      end || [],
+      flights: plan.flights&.map do |flight|
+        {
+          id: flight.id,
+          flight_number: flight.flight_number,
+          airline: flight.airline,
+          depart_date: flight.depart_date,
+          has_depart_time: flight.has_depart_time,
+          depart_airport: flight.depart_airport,
+          arrive_date: flight.arrive_date,
+          has_arrive_time: flight.has_arrive_time,
+          arrive_airport: flight.arrive_airport,
+          confirmation_id: flight.confirmation_id,
+          note: flight.note
+        }
+      end || []
     }
+  end
+
+  def plan_update_params
+    params.require(:plan).permit(
+      :title,
+      :is_public,
+      :notes,
+      :start_date,
+      :end_date,
+      places: [],
+      user_ids: [],
+      hotels_attributes: [:id, :google_place_id, :check_in, :check_out, :confirmation_id, :note, :_destroy],
+      flights_attributes: [
+        :id,
+        :flight_number,
+        :airline,
+        :depart_date,
+        :has_depart_time,
+        :depart_airport,
+        :arrive_date,
+        :has_arrive_time,
+        :arrive_airport,
+        :confirmation_id,
+        :note,
+        :_destroy
+      ]
+    )
+  end
+
+  def update_plan(plan, params)
+    plan.assign_attributes(
+      title: params[:title] || plan.title,
+      is_public: params.key?(:is_public) ? params[:is_public] : plan.is_public,
+      notes: params[:notes] || plan.notes
+    )
+
+    if params[:places]
+      plan.places = params[:places].map do |place_name|
+        Place.find_or_initialize_by(plan_id: plan.id, name: place_name)
+      end
+    end
+
+    if params[:user_ids]
+      user_ids = Array(params[:user_ids]).select { |id| id.to_s.match?(/^\d+$/) }
+      plan.users = User.where(id: user_ids)
+    end
+
+    if params[:hotels_attributes]
+      plan.hotels_attributes = params[:hotels_attributes]
+    end
+
+    if params[:flights_attributes]
+      plan.flights_attributes = params[:flights_attributes]
+    end
+
+    plan.save
   end
 end

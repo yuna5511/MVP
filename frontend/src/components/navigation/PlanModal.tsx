@@ -1,9 +1,9 @@
 import Modal from '../shared/Modal';
-import axios from 'axios';
 import { useToast } from '../../context/ToastContext';
 import { useAuth } from '../../context/AuthContext';
 import { useNavigate } from 'react-router';
 import { Plan } from '../../types/api';
+import { updatePlan } from '../../utils/plan';
 
 type Props = {
   plan: Plan | null;
@@ -19,10 +19,13 @@ const PlanModal = ({ plan, handleSetPlan }: Props) => {
   const handleAddUserToPlan = async () => {
     if (user && plan) {
       try {
-        const response = await axios.patch(`/api/plans/${plan.id}`, {
-          userIds: [...plan.userIds, user.id],
+        const response = await updatePlan({
+          id: plan.id,
+          body: {
+            user_ids: [...plan.userIds, user.id],
+          },
         });
-        handleSetPlan(response.data.plan); // Update plan with new userIds
+        handleSetPlan(response.data.plan);
         planDialog.close();
         showToast('あなたがオーナーとしてプランに追加されました！', 'success');
       } catch (error) {
@@ -55,7 +58,7 @@ const PlanModal = ({ plan, handleSetPlan }: Props) => {
             className="btn btn-primary font-semibold"
             onClick={handleAddUserToPlan}
           >
-            はい、オーナーとして追加
+            はい
           </button>
           <button
             className="btn btn-ghost font-semibold"

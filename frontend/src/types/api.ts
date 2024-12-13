@@ -17,7 +17,7 @@ export type Itinerary = {
 
 export type Plan = {
   id: string;
-  userIds: Array<string>;
+  userIds: Array<string | number>;
   title: string;
   isPublic: boolean;
   places: Array<Place>;
