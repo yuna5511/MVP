@@ -13,4 +13,5 @@ Rails.application.routes.draw do
   get 'profile', to: 'users#show'
   post 'validate-location', to: 'location_validator#validate'
   resources :plans, only: [:create]
+  get '/plans/:id', to: 'plans#show'
 end

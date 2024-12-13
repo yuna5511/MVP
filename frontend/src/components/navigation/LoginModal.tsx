@@ -88,7 +88,7 @@ const LoginModal = () => {
           {error && <p className="text-error">{error}</p>}
           <div className="flex justify-center">
             <button
-              className="btn btn-neutral w-[120px]"
+              className="btn btn-neutral w-[140px]"
               onClick={handleSubmit}
               disabled={!!loading}
             >

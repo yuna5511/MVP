@@ -23,7 +23,12 @@ const NavBar = () => {
   return (
     <div className="navbar bg-base-300">
       <div className="navbar-start flex-none">
-        <button className="btn btn-ghost text-2xl">tabishare</button>
+        <button
+          className="btn btn-ghost text-2xl"
+          onClick={() => navigate('/')}
+        >
+          tabishare
+        </button>
         <button className="btn btn-ghost font-medium">人気の旅行計画</button>
         <button className="btn btn-ghost font-medium">人気の旅行地</button>
       </div>

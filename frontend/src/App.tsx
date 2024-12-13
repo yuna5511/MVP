@@ -11,7 +11,7 @@ const App = () => {
         <Router>
           <Routes>
             <Route path="/" element={<Home />} />
-            <Route path="/plan" element={<TravelPlan />} />
+            <Route path="/travel-plan/:planId" element={<TravelPlan />} />
           </Routes>
         </Router>
       </ToastProvider>

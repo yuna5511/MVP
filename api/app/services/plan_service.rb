@@ -11,7 +11,7 @@ class PlanService
     end
 
     # プランを作成する（ユーザーなしで許可する）
-    plan = Plan.new(is_public: false, title: "New Plan")
+    plan = Plan.new(is_public: false, title: "#{places.join('、')}へ！")
     plan.users = users if users.present? # ユーザーなしでプランが存在できるようにする
 
     if plan.save(validate: false) # 保存時に検証をスキップし、ユーザー検証の衝突を避ける
