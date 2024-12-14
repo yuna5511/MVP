@@ -143,13 +143,13 @@ const PlanLayout = ({ plan }: Props) => {
             <iframe width="100%" height="100%" src={googleEmbedUrl}></iframe>
           </div>
         </div>
-        <div className="drawer-side h-full w-[200px]">
+        <div className="drawer-side h-full min-w-[200px]">
           <label
             htmlFor="my-drawer-expanded"
             aria-label="close sidebar"
             className="drawer-overlay"
           ></label>
-          <ul className="menu bg-base-200 text-base-content min-h-full p-4">
+          <ul className="menu bg-base-200 min-w-full text-base-content min-h-full p-4">
             <li>
               <details open>
                 <summary
