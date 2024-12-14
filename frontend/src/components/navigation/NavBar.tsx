@@ -23,7 +23,12 @@ const NavBar = () => {
   return (
     <div className="navbar bg-base-300">
       <div className="navbar-start flex-none">
-        <button className="btn btn-ghost text-2xl">tabishare</button>
+        <button
+          className="btn btn-ghost text-2xl"
+          onClick={() => navigate('/')}
+        >
+          tabishare
+        </button>
         <button className="btn btn-ghost font-medium">人気の旅行計画</button>
         <button className="btn btn-ghost font-medium">人気の旅行地</button>
       </div>
@@ -32,10 +37,7 @@ const NavBar = () => {
           {isAuthenticated ? (
             <div className="flex items-center">
               <span className="mr-4">{`こんにちは、${user?.lastName}さん`}</span>{' '}
-              <button
-                className="btn btn-neutral font-medium"
-                onClick={handleLogout}
-              >
+              <button className="btn btn-neutral " onClick={handleLogout}>
                 ログアウト
               </button>
             </div>

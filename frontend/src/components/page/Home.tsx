@@ -1,4 +1,5 @@
 import { useState, useCallback, useEffect } from 'react';
+import { useNavigate } from 'react-router';
 import PageLayout from '../shared/PageLayout';
 import Datepicker, { DateValueType } from 'react-tailwindcss-datepicker';
 import ListInput from '../shared/ListInput';
@@ -6,14 +7,18 @@ import { emailValidator, locationValidator } from '../../utils/validator';
 import { useAuth } from '../../context/AuthContext';
 import { useToast } from '../../context/ToastContext';
 import axios from 'axios';
+import { createPlan } from '../../utils/plan';
 
 const Home = () => {
   const { isAuthenticated, user } = useAuth();
   const { showToast } = useToast();
+  const navigate = useNavigate();
   const [dateRange, setDateRange] = useState<DateValueType>({
     startDate: null,
     endDate: null,
   });
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
 
   const [destinations, setDestinations] = useState<string[]>([]);
 
@@ -32,21 +37,33 @@ const Home = () => {
   }, []);
 
   const handleSubmit = async () => {
+    if (!destinations?.length) {
+      setError('場所を入力してください。');
+      return;
+    }
+    if (!dateRange?.startDate || !dateRange.endDate) {
+      setError('日付を入力してください。');
+      return;
+    }
     try {
       if (dateRange) {
+        setLoading(true);
         const userIds = isAuthenticated ? [user?.id, ...invites] : null;
-        const response = await axios.post('/api/plans', {
-          plan: {
-            user_ids: userIds,
-            start_date: dateRange.startDate,
-            end_date: dateRange.endDate,
-            places: destinations,
-          },
+        const response = await createPlan({
+          user_ids: userIds,
+          start_date: dateRange.startDate,
+          end_date: dateRange.endDate,
+          places: destinations,
         });
-        console.log('Plan created successfully', response.data);
-        showToast('Successfully created plan', 'success');
+        setLoading(false);
+        showToast('旅行作成に成功', 'success');
+        navigate(`/travel-plan/${response.data.plan.id}`, {
+          state: { plan: response.data.plan },
+        });
       }
     } catch (error) {
+      setLoading(false);
+      showToast('旅行の提出に失敗', 'error');
       if (axios.isAxiosError(error)) {
         console.error('API error:', error.response?.data || error.message);
       } else {
@@ -99,11 +116,18 @@ const Home = () => {
               )}
             </div>
           )}
+          {error && (
+            <div className="label">
+              <span className="label-text-alt text-error">{error}</span>
+            </div>
+          )}
           <div className="flex justify-center">
             <button
-              className="btn btn-neutral w-[120px]"
+              className="btn btn-neutral w-[160px]"
               onClick={handleSubmit}
+              disabled={!!loading}
             >
+              {loading && <span className="loading loading-spinner"></span>}
               計画を始める
             </button>
           </div>

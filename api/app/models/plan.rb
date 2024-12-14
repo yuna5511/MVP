@@ -4,8 +4,11 @@ class Plan < ApplicationRecord
 
   has_one :itinerary, dependent: :destroy
   has_many :places, dependent: :destroy
+  has_many :hotels, dependent: :destroy
+  has_many :flights, dependent: :destroy
 
   validates :title, presence: true
+  validates :notes, length: { maximum: 10_000 }, allow_blank: true
 
   # 競合を避けるため、関連するユーザーの検証をスキップする。
   validates_associated :users, if: -> { false } # ユーザーを検証しない

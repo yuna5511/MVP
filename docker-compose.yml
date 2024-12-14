@@ -10,6 +10,7 @@ services:
       - ".env"
     environment:
       - WATCHPACK_POLLING=true
+      - REACT_APP_GOOGLE_API_EMBED_KEY=${REACT_APP_GOOGLE_API_EMBED_KEY}
     volumes:
       - ./frontend:/app
     ports:
@@ -19,7 +20,7 @@ services:
       context: ./api
       dockerfile: Dockerfile
     command: |
-        sh -c "bundle exec rails db:create db:migrate && rails server --binding=0.0.0.0"
+      sh -c "bundle exec rails db:create db:migrate && rails server --binding=0.0.0.0"
     restart: "no"
     env_file:
       - ".env"

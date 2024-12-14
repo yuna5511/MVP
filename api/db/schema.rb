@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2024_12_10_123221) do
+ActiveRecord::Schema[8.0].define(version: 2024_12_14_132512) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -20,6 +20,35 @@ ActiveRecord::Schema[8.0].define(version: 2024_12_10_123221) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["itinerary_id"], name: "index_days_on_itinerary_id"
+  end
+
+  create_table "flights", force: :cascade do |t|
+    t.string "flight_number"
+    t.string "airline"
+    t.date "depart_date"
+    t.boolean "has_depart_time"
+    t.string "depart_airport"
+    t.date "arrive_date"
+    t.boolean "has_arrive_time"
+    t.string "confirmation_id"
+    t.string "note"
+    t.bigint "plan_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.string "arrive_airport"
+    t.index ["plan_id"], name: "index_flights_on_plan_id"
+  end
+
+  create_table "hotels", force: :cascade do |t|
+    t.string "google_place_id", null: false
+    t.date "check_in"
+    t.date "check_out"
+    t.string "confirmation_id"
+    t.string "note"
+    t.bigint "plan_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["plan_id"], name: "index_hotels_on_plan_id"
   end
 
   create_table "itineraries", force: :cascade do |t|
@@ -33,7 +62,7 @@ ActiveRecord::Schema[8.0].define(version: 2024_12_10_123221) do
 
   create_table "places", force: :cascade do |t|
     t.string "name"
-    t.string "google_address_id"
+    t.string "google_place_id"
     t.string "link"
     t.datetime "start_time"
     t.datetime "end_time"
@@ -41,6 +70,7 @@ ActiveRecord::Schema[8.0].define(version: 2024_12_10_123221) do
     t.bigint "plan_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.text "notes"
     t.index ["day_id"], name: "index_places_on_day_id"
     t.index ["plan_id"], name: "index_places_on_plan_id"
   end
@@ -51,6 +81,7 @@ ActiveRecord::Schema[8.0].define(version: 2024_12_10_123221) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.bigint "owner_id"
+    t.text "notes"
     t.index ["owner_id"], name: "index_plans_on_owner_id"
   end
 
@@ -72,6 +103,8 @@ ActiveRecord::Schema[8.0].define(version: 2024_12_10_123221) do
   end
 
   add_foreign_key "days", "itineraries"
+  add_foreign_key "flights", "plans"
+  add_foreign_key "hotels", "plans"
   add_foreign_key "itineraries", "plans"
   add_foreign_key "places", "days"
   add_foreign_key "places", "plans"
