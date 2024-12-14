@@ -15,11 +15,13 @@ class PlanService
     plan.users = users if users.present? # ユーザーなしでプランが存在できるようにする
 
     if plan.save(validate: false) # 保存時に検証をスキップし、ユーザー検証の衝突を避ける
-      Itinerary.create!(
+      itinerary = Itinerary.create!(
         plan: plan,
         start_date: start_date,
         end_date: end_date
       )
+
+      create_days(itinerary, start_date, end_date) # Create days for the itinerary
 
       places.each do |place_name|
         Rails.logger.info "place: #{place_name}"
@@ -39,6 +41,28 @@ class PlanService
   end
 
   private
+
+  def self.create_days(itinerary, start_date, end_date)
+    parsed_start_date = parse_date(start_date)
+    parsed_end_date = parse_date(end_date)
+  
+    raise ArgumentError, "Invalid date range" if parsed_start_date > parsed_end_date
+  
+    current_date = parsed_start_date
+    while current_date <= parsed_end_date
+      Rails.logger.info "Creating day: #{current_date}"
+      Day.create!(itinerary: itinerary, date: current_date)
+      current_date += 1.day
+    end
+  end
+  
+  def self.parse_date(date)
+    return date if date.is_a?(Date)
+    Date.parse(date.to_s)
+  rescue ArgumentError
+    raise ArgumentError, "Invalid date format: #{date}"
+  end
+  
 
   def self.fetch_google_id(location)
     return nil if location.nil? || location.strip.empty?

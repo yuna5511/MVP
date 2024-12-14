@@ -7,6 +7,7 @@ import { useAuth } from '../../context/AuthContext';
 import { Plan } from '../../types/api';
 import PlanModal from '../navigation/PlanModal';
 import { getPlan } from '../../utils/plan';
+import PlanLayout from '../travel-plan/PlanLayout';
 
 const TravelPlan = () => {
   const { showToast } = useToast();
@@ -43,7 +44,6 @@ const TravelPlan = () => {
   }, [plan]);
 
   useEffect(() => {
-    console.log('travel-plan: ', isAuthenticated, user, plan);
     const planDialog = document.getElementById(
       'plan_modal'
     ) as HTMLDialogElement;
@@ -56,6 +56,8 @@ const TravelPlan = () => {
       } else {
         if (!isAuthenticated || (user && !plan.userIds.includes(user?.id))) {
           navigate('/');
+        } else {
+          setLoading(false);
         }
       }
     }
@@ -63,17 +65,14 @@ const TravelPlan = () => {
 
   return (
     <PageLayout>
-      {loading ? (
+      {loading && (
         <div className="flex w-full h-full justify-center items-center gap-2">
           <span className="loading loading-spinner"></span>
           <span>ロード中...</span>
         </div>
-      ) : (
-        <>
-          <h1>{plan?.title}</h1>
-          <PlanModal handleSetPlan={handleSetPlan} plan={plan} />
-        </>
       )}
+      {!loading && plan && <PlanLayout plan={plan} />}
+      <PlanModal handleSetPlan={handleSetPlan} plan={plan} />
     </PageLayout>
   );
 };

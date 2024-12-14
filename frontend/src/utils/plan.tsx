@@ -9,7 +9,7 @@ type CreateRequestBody = {
   places?: Array<string>;
 };
 
-type HotelsAttributes = {
+export type Hotel = {
   id: string | number;
   google_place_id?: string;
   check_in?: Date;
@@ -18,7 +18,7 @@ type HotelsAttributes = {
   note?: string;
 };
 
-type FlightsAttributes = {
+export type Flight = {
   id: string | number;
   flight_number?: string;
   airline?: string;
@@ -36,8 +36,8 @@ type UpdateRequestBody = CreateRequestBody & {
   title?: string;
   is_public?: boolean;
   notes?: string;
-  hotels_attributes?: HotelsAttributes;
-  flights_attributes?: FlightsAttributes;
+  hotels_attributes?: Hotel;
+  flights_attributes?: Flight;
 };
 
 type UpdatePlanProps = {

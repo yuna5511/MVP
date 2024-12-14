@@ -1,18 +1,23 @@
+import { Flight, Hotel } from '../utils/plan';
+
 export type Place = {
   name: string;
-  googlePlaceId: string;
+  google_place_id: string;
   link: string;
-  startTime: Date;
-  endTime: Date;
+  start_time: Date | string;
+  end_time: Date | string;
 };
 
 export type Day = {
-  date: Date;
+  id: string | number;
+  date: Date | string;
   places: Array<Place>;
 };
 
 export type Itinerary = {
   days: Array<Day>;
+  startDate: string | Date;
+  endDate: string | Date;
 };
 
 export type Plan = {
@@ -22,4 +27,6 @@ export type Plan = {
   isPublic: boolean;
   places: Array<Place>;
   itinerary: Itinerary;
+  flights: Array<Flight>;
+  hotels: Array<Hotel>;
 };

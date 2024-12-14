@@ -52,10 +52,16 @@ class PlansController < ApplicationController
       title: plan.title,
       isPublic: plan.is_public,
       notes: plan.notes || '',
-      places: plan.places.as_json(only: [:id, :name, :google_place_id]),
+      places: plan.places.as_json(only: [:id, :name, :google_place_id, :notes]),
       itinerary: {
         startDate: plan.itinerary&.start_date,
-        endDate: plan.itinerary&.end_date
+        endDate: plan.itinerary&.end_date,
+        days: plan.itinerary&.days&.map do |day|
+          {
+            id: day.id,
+            date: day.date
+          }
+        end || []
       },
       hotels: plan.hotels&.map do |hotel|
         {
