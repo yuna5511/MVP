@@ -48,14 +48,14 @@ class PlansController < ApplicationController
   def serialize_plan(plan)
     {
       id: plan.id,
-      userIds: plan.users.map(&:id),
+      user_ids: plan.users.map(&:id),
       title: plan.title,
-      isPublic: plan.is_public,
+      is_public: plan.is_public,
       notes: plan.notes || '',
       places: plan.places.as_json(only: [:id, :name, :google_place_id, :notes]),
       itinerary: {
-        startDate: plan.itinerary&.start_date,
-        endDate: plan.itinerary&.end_date,
+        start_date: plan.itinerary&.start_date,
+        end_date: plan.itinerary&.end_date,
         days: plan.itinerary&.days&.map do |day|
           {
             id: day.id,

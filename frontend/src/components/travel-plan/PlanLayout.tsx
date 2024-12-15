@@ -1,9 +1,10 @@
 import { useRef, useState } from 'react';
 import { Plan } from '../../types/api';
 import { useFormattedDays } from '../../hooks/useFormattedDays';
-import Datepicker from 'react-tailwindcss-datepicker';
 import ExpandPanel from '../shared/ExpandPanel';
 import PlacesList from './PlacesList';
+import ItineraryLayout from './ItineraryLayout';
+import CalendarButton from '../shared/CalendarButton';
 
 type Props = {
   plan: Plan;
@@ -73,66 +74,65 @@ const PlanLayout = ({ plan }: Props) => {
             </button>
           </ul>
           <div
-            className={`flex flex-grow min-w-[480px] w-3/5 ${showSideMenu ? 'max-w-[calc(60%-88px)]' : 'max-w-[60%]'}`}
+            className={`flex flex-grow min-w-[480px] w-3/5 ${showSideMenu ? 'max-w-[calc(60%-80px)]' : 'max-w-[60%]'}`}
           >
             <div
-              className={`plan-form-container flex flex-col ${!showSideMenu ? 'ml-[88px]' : ''} items-center px-14 py-9 overflow-y-auto h-full w-full`}
+              className={`plan-form-container flex flex-col ${!showSideMenu ? 'ml-[88px]' : ''} items-center overflow-y-auto h-full w-full gap-7`}
             >
-              <div className="card bg-base-100 w-full max-w-[560px] shadow-lg h-44">
-                <div className="card-body flex flex-col justify-between px-6 py-5">
-                  <input
-                    type="text"
-                    placeholder="旅行名を入力してください"
-                    className="input w-full font-bold text-3xl"
-                    value={plan.title}
-                  />
-                  <div className="flex justify-between">
-                    <div className="w-[160px]">
-                      <Datepicker
-                        i18n={'ja'}
-                        value={{
-                          startDate: new Date(plan.itinerary.startDate),
-                          endDate: new Date(plan.itinerary.endDate),
-                        }}
-                        onChange={(newDateRange) => console.log(newDateRange)}
-                        popoverDirection="down"
-                        displayFormat="MM/DD"
+              <div className="flex flex-col items-center px-14 pt-9">
+                <div className="card bg-base-100 w-full max-w-[560px] shadow-lg h-44">
+                  <div className="card-body flex flex-col justify-between px-6 py-5">
+                    <input
+                      type="text"
+                      placeholder="旅行名を入力してください"
+                      className="input w-full font-bold text-3xl"
+                      value={plan.title}
+                    />
+                    <div className="flex justify-between">
+                      <CalendarButton
+                        startDate={plan.itinerary.start_date}
+                        endDate={plan.itinerary.end_date}
                       />
                     </div>
                   </div>
                 </div>
-              </div>
-              <div className="flex flex-col gap-8 mt-8 w-full items-center">
-                <div className="card bg-base-200 w-fit">
-                  <div className="card-body flex flex-col items-center px-6 py-5">
-                    <h2 className="font-semibold text-lg mb-4">予約</h2>
-                    <div className="flex justify-between">
-                      <button className="flex flex-col btn btn-square btn-ghost text-sm h-[60px]">
-                        <span className="material-icons">flight</span>
-                        <span className="text-[10px]">フライト</span>
-                      </button>
-                      <div className="divider lg:divider-horizontal"></div>
-                      <button className="flex flex-col btn btn-square btn-ghost text-sm h-[60px]">
-                        <span className="material-icons">hotel</span>
-                        <span className="text-[10px]">宿泊</span>
-                      </button>
+                <div className="flex flex-col gap-8 mt-8 w-full items-center">
+                  <div className="card bg-base-200 w-fit">
+                    <div className="card-body flex flex-col items-center px-6 py-5">
+                      <h2 className="font-semibold text-lg mb-4">予約</h2>
+                      <div className="flex justify-between">
+                        <button className="flex flex-col btn btn-square btn-ghost text-sm h-[60px]">
+                          <span className="material-icons">flight</span>
+                          <span className="text-[10px]">フライト</span>
+                        </button>
+                        <div className="divider lg:divider-horizontal"></div>
+                        <button className="flex flex-col btn btn-square btn-ghost text-sm h-[60px]">
+                          <span className="material-icons">hotel</span>
+                          <span className="text-[10px]">宿泊</span>
+                        </button>
+                      </div>
                     </div>
                   </div>
+                  <ExpandPanel parentRef={notesRef} title="注記">
+                    <div className="card bg-base-200 w-full">
+                      <div className="card-body p-2">
+                        <textarea
+                          className="textarea textarea-ghost w-full"
+                          placeholder="ここに何でも書き込んでください。"
+                        ></textarea>
+                      </div>
+                    </div>
+                  </ExpandPanel>
+                  <ExpandPanel parentRef={placesRef} title="訪問する場所">
+                    <PlacesList list={plan.places} />
+                  </ExpandPanel>
                 </div>
-                <ExpandPanel parentRef={notesRef} title="注記">
-                  <div className="card bg-base-200 w-full">
-                    <div className="card-body p-2">
-                      <textarea
-                        className="textarea textarea-ghost w-full"
-                        placeholder="ここに何でも書き込んでください。"
-                      ></textarea>
-                    </div>
-                  </div>
-                </ExpandPanel>
-                <ExpandPanel parentRef={placesRef} title="訪問する場所">
-                  <PlacesList list={plan.places} />
-                </ExpandPanel>
               </div>
+              <div className="bg-base-300 w-full h-[16px]"></div>
+              <ItineraryLayout
+                itineraryRef={itineraryRef}
+                itinerary={plan.itinerary}
+              />
             </div>
           </div>
           <div className="map-container fixed w-2/5 h-full right-0 top-[64px]">

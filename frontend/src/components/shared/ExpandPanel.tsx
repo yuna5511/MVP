@@ -6,6 +6,7 @@ type Props = {
   hasDivider?: boolean;
   title: string;
   children: ReactNode;
+  collapsedDescription?: string;
 };
 
 const ExpandPanel = ({
@@ -14,6 +15,7 @@ const ExpandPanel = ({
   hasDivider = true,
   title,
   children,
+  collapsedDescription,
 }: Props) => {
   const [show, setShow] = useState(true);
   const handleToggle = () => setShow((prevState) => !prevState);
@@ -37,10 +39,17 @@ const ExpandPanel = ({
           </button>
         )}
       </div>
-      <div
-        className={`transition-all ${show ? 'opacity-100' : 'opacity-0'} ease-in-out delay-100 duration-200 w-full mt-4`}
-      >
-        {show && children}
+      <div className="mt-4">
+        <div
+          className={`transition-all ${show ? 'opacity-100' : 'opacity-0'} ease-in-out delay-100 duration-200 w-full`}
+        >
+          {children}
+        </div>
+        <div
+          className={`transition-all ${!show ? 'opacity-100' : 'opacity-0'} ease-in-out delay-100 duration-200 w-full`}
+        >
+          {collapsedDescription}
+        </div>
       </div>
       {hasDivider && <div className="divider"></div>}
     </div>

@@ -48,13 +48,13 @@ const TravelPlan = () => {
       'plan_modal'
     ) as HTMLDialogElement;
     if (plan) {
-      if (plan.userIds.length === 0) {
+      if (plan.user_ids.length === 0) {
         setLoading(false);
         if (isAuthenticated && user) {
           planDialog.showModal();
         }
       } else {
-        if (!isAuthenticated || (user && !plan.userIds.includes(user?.id))) {
+        if (!isAuthenticated || (user && !plan.user_ids.includes(user?.id))) {
           navigate('/');
         } else {
           setLoading(false);

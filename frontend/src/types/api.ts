@@ -18,15 +18,15 @@ export type Day = {
 
 export type Itinerary = {
   days: Array<Day>;
-  startDate: string | Date;
-  endDate: string | Date;
+  start_date: string | Date;
+  end_date: string | Date;
 };
 
 export type Plan = {
   id: string;
-  userIds: Array<string | number>;
+  user_ids: Array<string | number>;
   title: string;
-  isPublic: boolean;
+  is_public: boolean;
   places: Array<Place>;
   itinerary: Itinerary;
   flights: Array<Flight>;

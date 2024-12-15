@@ -22,7 +22,7 @@ const PlanModal = ({ plan, handleSetPlan }: Props) => {
         const response = await updatePlan({
           id: plan.id,
           body: {
-            user_ids: [...plan.userIds, user.id],
+            user_ids: [...plan.user_ids, user.id],
           },
         });
         handleSetPlan(response.data.plan);
