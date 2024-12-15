@@ -1,11 +1,13 @@
 import { Flight, Hotel } from '../utils/plan';
 
 export type Place = {
+  id: string | number;
   name: string;
   google_place_id: string;
   link: string;
   start_time: Date | string;
   end_time: Date | string;
+  notes: string;
 };
 
 export type Day = {
