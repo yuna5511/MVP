@@ -1,0 +1,25 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  flight_number: MyString
+  airline: MyString
+  depart_date: 2024-12-13
+  has_depart_time: false
+  depart_airport: MyString
+  arrive_date: 2024-12-13
+  has_arrive_time: false
+  confirmation_id: MyString
+  note: MyString
+  plan: one
+
+two:
+  flight_number: MyString
+  airline: MyString
+  depart_date: 2024-12-13
+  has_depart_time: false
+  depart_airport: MyString
+  arrive_date: 2024-12-13
+  has_arrive_time: false
+  confirmation_id: MyString
+  note: MyString
+  plan: two
