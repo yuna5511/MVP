@@ -1,5 +1,0 @@
-.contents {
-  display: flex;
-  height: calc(100% - 64px); /* 64pxはヘッダーの高さ */
-  width: 100%;
-}

@@ -1,11 +1,13 @@
 import { Flight, Hotel } from '../utils/plan';
 
 export type Place = {
+  id: string | number;
   name: string;
   google_place_id: string;
   link: string;
   start_time: Date | string;
   end_time: Date | string;
+  notes: string;
 };
 
 export type Day = {
@@ -16,15 +18,15 @@ export type Day = {
 
 export type Itinerary = {
   days: Array<Day>;
-  startDate: string | Date;
-  endDate: string | Date;
+  start_date: string | Date;
+  end_date: string | Date;
 };
 
 export type Plan = {
   id: string;
-  userIds: Array<string | number>;
+  user_ids: Array<string | number>;
   title: string;
-  isPublic: boolean;
+  is_public: boolean;
   places: Array<Place>;
   itinerary: Itinerary;
   flights: Array<Flight>;

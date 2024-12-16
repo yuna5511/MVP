@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import dayjs from 'dayjs';
+import dayjs, { Dayjs } from 'dayjs';
 import 'dayjs/locale/ja';
 
 import { Day } from '../types/api';
@@ -7,6 +7,12 @@ import { Day } from '../types/api';
 type FormattedDay = Day & {
   dateFormatShort: string;
   dateFormatLong: string;
+};
+
+const DATE_FORMAT_LONG = 'MM月DD日dddd';
+
+export const formatDateLong = (date: Dayjs) => {
+  return date.format(DATE_FORMAT_LONG);
 };
 
 export function useFormattedDays(days: Day[] | undefined): FormattedDay[] {
@@ -20,7 +26,7 @@ export function useFormattedDays(days: Day[] | undefined): FormattedDay[] {
       const dateFormatShort = dateObj.format('MM/DD (dd)');
 
       // 例: 11月18日月曜日
-      const dateFormatLong = dateObj.format('MM月DD日dddd');
+      const dateFormatLong = formatDateLong(dateObj);
 
       return {
         ...day,

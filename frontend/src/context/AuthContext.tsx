@@ -6,6 +6,7 @@ import React, {
   useEffect,
 } from 'react';
 import axios from 'axios';
+import { usePlanStore } from '../stores/planStore';
 
 interface User {
   id: number;
@@ -38,6 +39,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const isAuthenticated = !!user;
+  const clearPlan = usePlanStore((state) => state.clearPlan);
 
   const login = async (email: string, password: string) => {
     const response = await axios.post('/api/login', { email, password });
@@ -51,6 +53,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   const logout = async () => {
     sessionStorage.removeItem('token');
     setUser(null);
+    clearPlan();
   };
 
   const fetchUserProfile = async () => {
