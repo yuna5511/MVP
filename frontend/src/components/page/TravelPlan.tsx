@@ -8,6 +8,7 @@ import { Plan } from '../../types/api';
 import PlanModal from '../navigation/PlanModal';
 import { getPlan } from '../../utils/plan';
 import PlanLayout from '../travel-plan/PlanLayout';
+import { usePlanStore, PlanState } from '../../stores/planStore';
 
 const TravelPlan = () => {
   const { showToast } = useToast();
@@ -15,7 +16,9 @@ const TravelPlan = () => {
   const { planId } = useParams<string>();
   const location = useLocation();
   const navigate = useNavigate();
-  const [plan, setPlan] = useState<Plan | null>(location.state?.plan || null);
+  const setPlan = usePlanStore((state: PlanState) => state.setPlan);
+  const clearPlan = usePlanStore((state) => state.clearPlan);
+  const plan = usePlanStore((state: PlanState) => state.plan);
   const [loading, setLoading] = useState(true);
 
   const handleSetPlan = (plan: Plan) => setPlan(plan);
@@ -27,6 +30,7 @@ const TravelPlan = () => {
         setPlan(response.data.plan);
       } catch (error) {
         setLoading(false);
+        navigate('/');
         showToast('プランの取得に失敗しました', 'error');
         if (axios.isAxiosError(error)) {
           console.error('API error:', error.response?.data || error.message);
@@ -36,6 +40,17 @@ const TravelPlan = () => {
       }
     }
   };
+
+  useEffect(() => {
+    clearPlan(); // 入場前クリアー
+    return () => clearPlan(); // 出発前クリアー
+  }, [clearPlan]);
+
+  useEffect(() => {
+    if (location.state?.plan) {
+      setPlan(location.state?.plan);
+    }
+  }, [location, setPlan]);
 
   useEffect(() => {
     if (!plan) {
@@ -71,7 +86,7 @@ const TravelPlan = () => {
           <span>ロード中...</span>
         </div>
       )}
-      {!loading && plan && <PlanLayout plan={plan} />}
+      {!loading && plan && <PlanLayout />}
       <PlanModal handleSetPlan={handleSetPlan} plan={plan} />
     </PageLayout>
   );

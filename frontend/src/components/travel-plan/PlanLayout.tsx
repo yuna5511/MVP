@@ -1,22 +1,19 @@
 import { useRef, useState } from 'react';
-import { Plan } from '../../types/api';
 import { useFormattedDays } from '../../hooks/useFormattedDays';
 import ExpandPanel from '../shared/ExpandPanel';
 import PlacesList from './PlacesList';
 import ItineraryLayout from './ItineraryLayout';
 import CalendarButton from '../shared/CalendarButton';
+import { usePlanStore, PlanState } from '../../stores/planStore';
 
-type Props = {
-  plan: Plan;
-};
-
-const PlanLayout = ({ plan }: Props) => {
+const PlanLayout = () => {
   const notesRef = useRef(null);
   const placesRef = useRef(null);
   const flightsRef = useRef(null);
   const hotelsRef = useRef(null);
   const itineraryRef = useRef(null);
   const [showSideMenu, setShowSideMenu] = useState(true);
+  const plan = usePlanStore((state: PlanState) => state.plan);
 
   const handleScrollToTop = () => {
     window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
@@ -31,16 +28,20 @@ const PlanLayout = ({ plan }: Props) => {
   };
   // TODO: 予算セクション
 
-  const formattedDays = useFormattedDays(plan.itinerary?.days);
+  const formattedDays = useFormattedDays(
+    plan ? plan.itinerary?.days : undefined
+  );
   const toggleSideMenu = () => setShowSideMenu((prevState) => !prevState);
 
   // TODO:一時的な解決策
   const GOOGLE_API_KEY = process.env.REACT_APP_GOOGLE_API_EMBED_KEY;
   const placeId =
-    plan.places.length > 0
+    plan && plan.places.length > 0
       ? `place_id:${plan.places[0].google_place_id}`
       : 'Japan';
   const googleEmbedUrl = `https://www.google.com/maps/embed/v1/place?key=${GOOGLE_API_KEY}&q=${placeId}&zoom=17`;
+
+  if (!plan) return null;
 
   return (
     <>
@@ -79,7 +80,7 @@ const PlanLayout = ({ plan }: Props) => {
             <div
               className={`plan-form-container flex flex-col ${!showSideMenu ? 'ml-[88px]' : ''} items-center overflow-y-auto h-full w-full gap-7`}
             >
-              <div className="flex flex-col items-center px-14 pt-9">
+              <div className="flex flex-col items-center px-14 pt-9 w-full">
                 <div className="card bg-base-100 w-full max-w-[560px] shadow-lg h-44">
                   <div className="card-body flex flex-col justify-between px-6 py-5">
                     <input
@@ -123,16 +124,21 @@ const PlanLayout = ({ plan }: Props) => {
                       </div>
                     </div>
                   </ExpandPanel>
-                  <ExpandPanel parentRef={placesRef} title="訪問する場所">
-                    <PlacesList list={plan.places} />
+                  <ExpandPanel
+                    parentRef={placesRef}
+                    title="訪問する場所"
+                    collapsedDescription={
+                      plan.places?.length
+                        ? `${plan.places?.length}ヶ所`
+                        : '0ヶ所'
+                    }
+                  >
+                    <PlacesList list={plan.places} planId={plan.id} />
                   </ExpandPanel>
                 </div>
               </div>
               <div className="bg-base-300 w-full h-[16px]"></div>
-              <ItineraryLayout
-                itineraryRef={itineraryRef}
-                itinerary={plan.itinerary}
-              />
+              <ItineraryLayout itineraryRef={itineraryRef} />
             </div>
           </div>
           <div className="map-container fixed w-2/5 h-full right-0 top-[64px]">

@@ -41,12 +41,12 @@ const ExpandPanel = ({
       </div>
       <div className="mt-4">
         <div
-          className={`transition-all ${show ? 'opacity-100' : 'opacity-0'} ease-in-out delay-100 duration-200 w-full`}
+          className={`transition-all ${show ? 'opacity-100' : 'opacity-0 hidden'} ease-in-out delay-100 duration-200 w-full`}
         >
           {children}
         </div>
         <div
-          className={`transition-all ${!show ? 'opacity-100' : 'opacity-0'} ease-in-out delay-100 duration-200 w-full`}
+          className={`transition-all ${!show ? 'opacity-100' : 'opacity-0 hidden'} ease-in-out delay-100 duration-200 w-full`}
         >
           {collapsedDescription}
         </div>

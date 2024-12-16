@@ -20,7 +20,7 @@ const DayPanel = ({ day }: Props) => {
 
   return (
     <ExpandPanel title={title} collapsedDescription={getCollapsedDescription()}>
-      <PlacesList list={day?.places} />
+      <PlacesList list={day?.places} dayId={day.id} />
     </ExpandPanel>
   );
 };

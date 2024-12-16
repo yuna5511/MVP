@@ -59,7 +59,8 @@ class PlansController < ApplicationController
         days: plan.itinerary&.days&.map do |day|
           {
             id: day.id,
-            date: day.date
+            date: day.date,
+            places: day.places.as_json(only: [:id, :name, :google_place_id, :notes])
           }
         end || []
       },

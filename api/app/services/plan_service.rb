@@ -1,4 +1,6 @@
-require 'google_places'
+require 'ostruct'
+require 'net/http'
+require 'json'
 
 class PlanService
   def self.create_plan(user_ids:, start_date:, end_date:, places:)
@@ -6,8 +8,8 @@ class PlanService
     users = User.where(id: valid_user_ids) if valid_user_ids.present?
 
     if places.nil? || places.empty?
-      Rails.logger.error "No places provided for the plan."
-      raise ArgumentError, "Places cannot be empty"
+      Rails.logger.error "プランのための場所は用意されていない"
+      raise ArgumentError, "場所を空にすることはできない"
     end
 
     # プランを作成する（ユーザーなしで許可する）
@@ -25,13 +27,18 @@ class PlanService
 
       places.each do |place_name|
         Rails.logger.info "place: #{place_name}"
-        google_place_id = fetch_google_id(place_name)
-        Place.create!(
-          plan: plan,
-          name: place_name,
-          google_place_id: google_place_id
-        )
-      end
+        google_result = fetch_google_result(place_name)
+        if google_result
+          Place.create!(
+            plan: plan,
+            name: google_result.description, # Use description
+            google_place_id: google_result.place_id, # Use place_id
+            link: "https://www.google.com/maps/place/?q=place_id:#{google_result.place_id}" # Construct the link
+          )
+        else
+          Rails.logger.warn "No Google result found for place: #{place_name}"
+        end
+      end      
 
       plan
     else
@@ -64,23 +71,49 @@ class PlanService
   end
   
 
-  def self.fetch_google_id(location)
+  def self.fetch_google_result(location)
     return nil if location.nil? || location.strip.empty?
   
-    client = GooglePlaces::Client.new(ENV['GOOGLE_API_KEY'] || Rails.application.credentials.dig(:google_places, :api_key))
-    begin
-      results = client.predictions_by_input(location, types: "geocode")
-      Rails.logger.info "Google API response for #{location}: #{results.first.inspect}"
+    google_api_key = ENV['GOOGLE_API_KEY'] || Rails.application.credentials.dig(:google_places, :api_key)
+    uri = URI("https://places.googleapis.com/v1/places:autocomplete")
   
-      if results.empty?
-        Rails.logger.warn "No results found for #{location}"
-        nil
+    # Create a POST request
+    http = Net::HTTP.new(uri.host, uri.port)
+    http.use_ssl = true
+    request = Net::HTTP::Post.new(uri.path, { 
+      'Content-Type' => 'application/json',
+      'X-Goog-Api-Key' => google_api_key # Pass API key in the header
+    })
+  
+    # Construct the JSON body for the request
+    request.body = {
+      input: location,
+    }.to_json
+  
+    begin
+      response = http.request(request)
+      response_body = JSON.parse(response.body)
+  
+      if response.is_a?(Net::HTTPSuccess)
+        Rails.logger.info "Google API response: #{response_body.inspect}"
+        result = response_body['suggestions']&.first&.dig('placePrediction')
+        if result
+          # Extract relevant fields and return as OpenStruct
+          OpenStruct.new(
+            description: result['structuredFormat']['mainText']['text'],
+            place_id: result['placeId']
+          )
+        else
+          Rails.logger.warn "No predictions found for #{location}"
+          nil
+        end
       else
-        results.first.place_id
+        Rails.logger.error "Google Places API call failed: #{response_body.inspect}"
+        nil
       end
     rescue StandardError => e
-      Rails.logger.error "Google Place ID fetch failed for #{location}: #{e.message}"
+      Rails.logger.error "Error fetching Google Place ID: #{e.message}"
       nil
     end
-  end
+  end  
 end
