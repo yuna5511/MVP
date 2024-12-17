@@ -4,17 +4,21 @@ services:
       context: ./frontend
       dockerfile: Dockerfile
     command: |
-      sh -c "yarn install && yarn start"
+      sh -c "yarn install && node --max-old-space-size=1024 node_modules/.bin/react-scripts start"
     restart: "no"
     env_file:
       - ".env"
     environment:
-      - WATCHPACK_POLLING=true
       - REACT_APP_GOOGLE_API_EMBED_KEY=${REACT_APP_GOOGLE_API_EMBED_KEY}
     volumes:
       - ./frontend:/app
     ports:
       - "3000:3000"
+    deploy:
+      resources:
+        limits:
+          cpus: "0.4"
+          memory: 2G
   api:
     build:
       context: ./api
@@ -31,6 +35,11 @@ services:
       - ./api:/app
     ports:
       - "3001:3000"
+    deploy:
+      resources:
+        limits:
+          cpus: "0.4"
+          memory: 2G
   postgres:
     image: postgres:12.11-alpine
     env_file:

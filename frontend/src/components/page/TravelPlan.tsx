@@ -42,17 +42,23 @@ const TravelPlan = () => {
   };
 
   useEffect(() => {
+    console.log('testing clear plan: ', plan);
     clearPlan(); // 入場前クリアー
-    return () => clearPlan(); // 出発前クリアー
+    return () => {
+      console.log('testing cleared unmount');
+      clearPlan();
+    }; // 出発前クリアー
   }, [clearPlan]);
 
   useEffect(() => {
+    console.log('testing location: ', plan);
     if (location.state?.plan) {
       setPlan(location.state?.plan);
     }
   }, [location, setPlan]);
 
   useEffect(() => {
+    console.log('testing fetch plan: ', plan);
     if (!plan) {
       fetchPlan().catch(console.error);
     }
@@ -70,6 +76,7 @@ const TravelPlan = () => {
         }
       } else {
         if (!isAuthenticated || (user && !plan.user_ids.includes(user?.id))) {
+          console.log('testing user: ', user, plan, isAuthenticated);
           navigate('/');
         } else {
           setLoading(false);
