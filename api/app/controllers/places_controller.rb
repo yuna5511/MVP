@@ -14,7 +14,6 @@ class PlacesController < ApplicationController
     google_api_key = ENV['GOOGLE_API_KEY'] || Rails.application.credentials.dig(:google_places, :api_key)
     uri = URI("https://places.googleapis.com/v1/places:autocomplete")
 
-    # Create a POST request
     http = Net::HTTP.new(uri.host, uri.port)
     http.use_ssl = true
     request = Net::HTTP::Post.new(uri.path, {
@@ -22,7 +21,6 @@ class PlacesController < ApplicationController
       'X-Goog-Api-Key' => google_api_key
     })
 
-    # Construct the JSON body for the request
     request.body = {
       input: input,
     }.to_json
@@ -52,13 +50,38 @@ class PlacesController < ApplicationController
     end
   end
 
-  # Create a new Place
   def create
     place_params = params.require(:place).permit(:name, :google_place_id, :link, :start_time, :end_time, :day_id, :plan_id, :notes)
     @place = Place.new(place_params)
 
     if @place.save
       render json: { success: true, place: @place }, status: :created
+    else
+      render json: { success: false, errors: @place.errors.full_messages }, status: :unprocessable_entity
+    end
+  end
+
+  def update
+    place_params = params.require(:place).permit(:name, :google_place_id, :link, :start_time, :end_time, :day_id, :plan_id, :notes)
+    @place = Place.find_by(id: params[:id])
+  
+    if @place.nil?
+      render json: { success: false, error: "場所が見つかりません" }, status: :not_found
+      return
+    end
+  
+    if @place.update(place_params)
+      render json: { success: true, place: @place }, status: :ok
+    else
+      render json: { success: false, errors: @place.errors.full_messages }, status: :unprocessable_entity
+    end
+  end
+
+  def destroy
+    @place = Place.find(params[:id])
+
+    if @place.destroy
+      render json: { success: true, message: '削除に成功した場所' }, status: :ok
     else
       render json: { success: false, errors: @place.errors.full_messages }, status: :unprocessable_entity
     end

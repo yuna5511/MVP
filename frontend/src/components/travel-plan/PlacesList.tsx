@@ -12,7 +12,13 @@ const PlacesList = ({ list, planId, dayId }: Props) => {
   return (
     <div className="flex flex-col w-full gap-3">
       {list?.map((place, idx) => (
-        <PlaceCard index={idx + 1} key={`place-${place.id}`} place={place} />
+        <PlaceCard
+          index={idx + 1}
+          key={`place-${place.id}`}
+          place={place}
+          dayId={dayId}
+          planId={planId}
+        />
       ))}
       <PlaceAutocomplete planId={planId} dayId={dayId} />
     </div>

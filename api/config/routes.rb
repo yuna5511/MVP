@@ -13,7 +13,7 @@ Rails.application.routes.draw do
   get 'profile', to: 'users#show'
   post 'validate-location', to: 'location_validator#validate'
   resources :plans, only: [:create, :show, :update]
-  resources :places, only: [:create] do
+  resources :places, only: [:create, :update, :destroy] do
     collection do
       post :autocomplete
     end
